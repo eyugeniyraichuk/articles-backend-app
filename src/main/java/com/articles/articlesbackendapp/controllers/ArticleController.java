@@ -11,8 +11,8 @@ import com.articles.articlesbackendapp.repos.ArticleRepo;
 import com.articles.articlesbackendapp.repos.AuthorRepo;
 import com.articles.articlesbackendapp.service.ArticleService;
 import com.articles.articlesbackendapp.service.AuthorService;
-import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,23 +27,17 @@ import java.util.List;
 @RequestMapping("article")
 public class ArticleController {
 
+    @Autowired
     private ArticleRepo articleRepo;
-    private AuthorRepo authorRepo;
+    @Autowired
     private ArticleService articleService;
+    @Autowired
     private AuthorService authorService;
 
-    @Autowired
-    public ArticleController( ArticleRepo articleRepo, AuthorRepo authorRepo,
-                              ArticleService articleService, AuthorService authorService ) {
-        this.articleRepo = articleRepo;
-        this.authorRepo = authorRepo;
-        this.articleService = articleService;
-        this.authorService = authorService;
+    public ArticleController() {
     }
 
-    @RequestMapping(
-        params = { "title", "summary" , "text", "authorId"},
-        method = POST)
+    @RequestMapping( params = { "title", "summary" , "text", "authorId"}, method = POST)
     @ResponseBody
     public List<Article> create(@RequestParam String title, @RequestParam String summary, @RequestParam String text, @RequestParam String authorId
     ) {
@@ -59,23 +53,20 @@ public class ArticleController {
 
     @GetMapping
     public List<Article> read() {
-        return IterableUtils.toList(articleRepo.findAll());
+        return articleService.findAll();
     }
 
     @GetMapping("{id}")
     public Article read(@PathVariable String id) {
-        Article article = articleService.findById(id);
-        return article;
+        return articleService.findById(id);
     }
 
-    @RequestMapping(
-        value = "/{id}",
-        params = { "title", "summary" , "text"},
-        method = PUT)
+    @RequestMapping( value = "/{id}", params = { "title", "summary" , "text"}, method = PUT)
     @ResponseBody
     public List<Article> update(@PathVariable String id ,
                          @RequestParam String title, @RequestParam String summary, @RequestParam String text) {
         Article article = articleService.findById(id);
+
         article.setTitle(title);
         article.setSummary(summary);
         article.setText(text);
@@ -85,9 +76,7 @@ public class ArticleController {
         return read();
     }
 
-    @RequestMapping(
-        params = {"id"},
-        method = DELETE)
+    @RequestMapping( params = {"id"}, method = DELETE)
     @ResponseBody
     public List<Article> delete(@RequestParam String id) {
         Article article = articleService.findById(id);
